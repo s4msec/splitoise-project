@@ -3,6 +3,8 @@
 import { Button } from "@repo/ui/components/button";
 import HelloWorld from "@/components/hello-world";
 import Image from "next/image";
+import CreateUser from "@/components/create-user";
+import ListUsers from "@/components/list-users";
 
 export function Welcome() {
   return (
@@ -84,6 +86,8 @@ export function Welcome() {
           </Button>
         </a>
         <HelloWorld />
+        <CreateUser />
+        <ListUsers />
       </div>
     </div>
   );
