@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(100)
+  description String     @db.VarChar(255)
+  Splitter    Splitter[]
+}
+
+model Country {
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(100)
+  redirectMessage  String             @db.VarChar(255)
+  icon             String?            @db.VarChar(255)
+  ProjectCountries ProjectCountries[]
+  Splitter         Splitter[]
+}
+
+model Link {
+  id       Int      @id @default(autoincrement())
+  splitId  Int
+  url      String   @db.VarChar(2048)
+  type     Int
+  prob     Float
+  ecpm     Float
+  hidden   Boolean  @default(false)
+  Split    Split    @relation(fields: [splitId], references: [id])
+  LinkType LinkType @relation(fields: [type], references: [id])
+}
+
+model LinkType {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(100)
+  Link Link[]
+}
+
+model Project {
+  id               Int                @id @default(autoincrement())
+  uuid             String             @unique @db.VarChar(256)
+  userId           Int
+  name             String             @db.VarChar(100)
+  description      String
+  icon             String             @db.VarChar(256)
+  User             User               @relation(fields: [userId], references: [id])
+  ProjectCountries ProjectCountries[]
+  Splitter         Splitter[]
+
+  @@index([userId])
+}
+
+model ProjectCountries {
+  id        Int     @id @default(autoincrement())
+  projectId Int
+  countryId Int
+  pixelId   String  @db.VarChar(128)
+  capiToken String  @db.VarChar(512)
+  Country   Country @relation(fields: [countryId], references: [id])
+  Project   Project @relation(fields: [projectId], references: [id])
+}
+
+model Split {
+  id           Int      @id @default(autoincrement())
+  redirectSlug String   @unique @db.VarChar(256)
+  splitterId   Int
+  Link         Link[]
+  Splitter     Splitter @relation(fields: [splitterId], references: [id])
+}
+
+model Splitter {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique @db.VarChar(256)
+  projectId  Int
+  categoryId Int
+  countryId  Int
+  Split      Split[]
+  Category   Category @relation(fields: [categoryId], references: [id])
+  Country    Country  @relation(fields: [countryId], references: [id])
+  Project    Project  @relation(fields: [projectId], references: [id])
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  name     String    @db.VarChar(100)
+  password String    @db.VarChar(256)
+  role     String    @db.VarChar(256)
+  Project  Project[]
+}
