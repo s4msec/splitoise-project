@@ -1,14 +1,32 @@
-import { PrismaClient } from "../generated/prisma";
+import { PrismaClient as PrismaClientSplitoise } from "../generated/splitoise";
+import { PrismaClient as PrismaClientIntended } from "../generated/intended";
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+declare global {
+  var splitoisePrisma: PrismaClientSplitoise | undefined;
+  var intendedPrisma: PrismaClientIntended | undefined;
+}
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
+// Create or reuse the Prisma clients for both databases
+export const splitoisePrisma =
+  global.splitoisePrisma ||
+  new PrismaClientSplitoise({
     log:
       process.env.NODE_ENV === "development"
         ? ["query", "error", "warn"]
         : ["error"],
   });
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+export const intendedPrisma =
+  global.intendedPrisma ||
+  new PrismaClientIntended({
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
+  });
+
+// Make the Prisma clients available globally in development mode to avoid multiple instances
+if (process.env.NODE_ENV !== "production") {
+  global.splitoisePrisma = splitoisePrisma;
+  global.intendedPrisma = intendedPrisma;
+}

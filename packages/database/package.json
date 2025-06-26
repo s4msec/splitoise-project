@@ -1,16 +1,18 @@
 {
-  "name": "@repo/database",
+  "name": "@splitoise/db",
   "version": "0.0.0",
   "private": true,
   "scripts": {
     "build": "tsup ./index.ts",
     "dev": "tsup ./index.ts --watch",
-    "db:generate": "prisma generate",
+    "db:generate": "prisma generate --schema=./prisma/schema.prisma && prisma generate --schema=./prisma/intended.prisma",
     "db:migrate": "prisma migrate dev --skip-generate",
-    "db:deploy": "prisma migrate deploy"
+    "db:deploy": "prisma migrate deploy",
+    "db:push": "prisma db push",
+    "db:pull": "prisma db pull"
   },
   "devDependencies": {
-    "@repo/typescript-config": "workspace:*",
+    "@splitoise/typescript-config": "workspace:*",
     "@types/node": "^22.15.30",
     "prisma": "^6.9.0",
     "tsup": "^8.5.0",

@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/intended"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL_INTENDED")
+}
+
+model admanagerNetworks {
+  id                  Int      @id @default(autoincrement())
+  name                String   @unique
+  displayName         String
+  networkId           String   @unique
+  networkCode         String   @unique
+  currencyCode        String
+  createTime          DateTime @default(now())
+  updateTime          DateTime @updatedAt
+
+  reports                admanagerReports[]
+  admanagerReportResults admanagerReportResults[]
+  reportStatus  admanagerStatus[]
+}
+
+model admanagerReports {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  reportId    String      @unique
+  displayName String
+  networkCode String
+  createTime  DateTime
+  updateTime  DateTime @updatedAt
+
+  network       admanagerNetworks        @relation(fields: [networkCode], references: [networkCode])
+  reportResults admanagerReportResults[]
+  reportStatus  admanagerStatus[]
+}
+
+model admanagerReportResults {
+  id                    Int      @id @default(autoincrement())
+  reportId              String
+  networkCode           String
+  keyValue              String
+  adExchangeImpressions Int
+  adExchangeClicks      Int
+  adExchangeCTR         Float
+  adExchangeRevenue     Float
+  adExchangeAverageECPM Float
+  createTime            DateTime
+  updateTime            DateTime @updatedAt
+
+  report  admanagerReports  @relation(fields: [reportId], references: [reportId])
+  network admanagerNetworks @relation(fields: [networkCode], references: [networkCode])
+
+  @@unique([reportId, keyValue, createTime])
+}
+
+model admanagerStatus {
+  id                    Int      @id @default(autoincrement())
+  reportId              String
+  networkCode           String
+  hour                  String
+  adExchangeAverageECPM Float
+  createTime            DateTime
+  updateTime            DateTime @updatedAt
+
+  report  admanagerReports  @relation(fields: [reportId], references: [reportId])
+  network admanagerNetworks @relation(fields: [networkCode], references: [networkCode])
+
+  @@unique([reportId, hour, createTime])
+}

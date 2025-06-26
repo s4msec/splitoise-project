@@ -1,0 +1,1 @@
+export { WorkerModule } from "./v1/worker/worker.module";
