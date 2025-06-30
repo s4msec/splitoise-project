@@ -1,17 +1,12 @@
-import { Injectable, OnModuleInit } from "@nestjs/common";
-import { Cron } from "@nestjs/schedule";
-
+import { Injectable } from "@nestjs/common";
 import { AnalystService } from "../analyst/analyst.service";
 
 @Injectable()
-export class WorkerService implements OnModuleInit {
+export class WorkerService {
     constructor(private readonly analystService: AnalystService) {}
-    async onModuleInit() {
-       await this.analystService.analyzeSplits();
-    }
-
-    @Cron('0 */2 * * *')
+    
     async redistributePercentagesPastTwoHours() {
-        await this.analystService.analyzeSplits();
+        const analysisResult = await this.analystService.analyzeSplits();
+        if (analysisResult) return true;
     }
 }
